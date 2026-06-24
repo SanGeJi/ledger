@@ -1,0 +1,60 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif; background: #f4f5f9; color: #1a1a2e; }
+button { cursor: pointer; border: none; border-radius: 8px; padding: 8px 14px; font-size: 14px; }
+input, select { border: 1px solid #d8dae5; border-radius: 8px; padding: 8px 10px; font-size: 14px; background: #fff; }
+input:focus, select:focus { outline: none; border-color: #6366f1; }
+.primary { background: #6366f1; color: #fff; }
+.primary:hover { background: #5457e0; }
+.ghost { background: #fff; color: #555; border: 1px solid #d8dae5; }
+.link { background: none; color: #6366f1; padding: 2px 6px; }
+.block { width: 100%; }
+.nav { display: flex; align-items: center; gap: 8px; padding: 12px 20px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.06); position: sticky; top: 0; z-index: 10; }
+.nav .brand { font-weight: 700; font-size: 18px; margin-right: 12px; color: #6366f1; }
+.nav a { text-decoration: none; color: #667; padding: 6px 12px; border-radius: 8px; font-size: 14px; }
+.nav a.active { background: #eef0ff; color: #6366f1; font-weight: 600; }
+.nav .spacer { flex: 1; }
+.nav .user { color: #999; font-size: 13px; }
+.page { max-width: 900px; margin: 0 auto; padding: 20px; }
+.spacer { flex: 1; }
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
+.auth-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #6366f1, #8b5cf6); }
+.auth { background: #fff; padding: 32px; border-radius: 16px; width: 320px; box-shadow: 0 20px 50px rgba(0,0,0,.2); }
+.auth h1 { color: #6366f1; text-align: center; }
+.auth .sub { text-align: center; color: #999; margin: 4px 0 20px; }
+.tabs { display: flex; gap: 4px; margin-bottom: 16px; background: #f0f1f5; border-radius: 8px; padding: 4px; }
+.tabs button { flex: 1; background: none; color: #888; }
+.tabs button.on { background: #fff; color: #6366f1; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+.auth input { width: 100%; margin-bottom: 10px; }
+.auth .block { margin-top: 4px; }
+.err { color: #ef4444; font-size: 13px; text-align: center; margin-top: 8px; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px; }
+.card { background: #fff; border-radius: 12px; padding: 18px; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
+.card .lbl { display: block; color: #999; font-size: 13px; margin-bottom: 6px; }
+.card .val { font-size: 24px; font-weight: 700; }
+.card.income .val { color: #22c55e; }
+.card.expense .val { color: #ff6a3d; }
+.card.balance .val { color: #6366f1; }
+.charts { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; }
+.chart-box { background: #fff; border-radius: 12px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
+.chart-box h3 { font-size: 14px; margin-bottom: 12px; color: #667; }
+.form-card { background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
+.form-card h3 { font-size: 15px; margin-bottom: 12px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.span2 { grid-column: span 2; }
+.list { background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.05); overflow: hidden; }
+.th, .tr { display: grid; grid-template-columns: 1fr .8fr 1fr 1.4fr 1fr .8fr; gap: 8px; padding: 10px 14px; align-items: center; font-size: 14px; }
+.th { background: #f7f8fb; color: #999; font-size: 12px; }
+.tr { border-top: 1px solid #f0f1f5; }
+.r { text-align: right; }
+.income { color: #22c55e; }
+.expense { color: #ff6a3d; }
+.cat { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid #f0f1f5; }
+.cat i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.cat .link { margin-left: auto; }
+.muted { color: #bbb; text-align: center; padding: 20px; font-size: 14px; }
+@media (max-width: 600px) {
+  .stats { grid-template-columns: 1fr; }
+  .charts { grid-template-columns: 1fr; }
+  .th, .tr { grid-template-columns: 1fr .8fr .8fr; font-size: 12px; }
+  .th span:nth-child(3), .th span:nth-child(4), .tr span:nth-child(3), .tr span:nth-child(4) { display: none; }
+}
