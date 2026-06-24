@@ -1,0 +1,12 @@
+{
+  "name": "ledger",
+  "version": "1.0.0",
+  "description": "全栈记账应用 - 独立开发",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server/app.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0"
+  }
+}
