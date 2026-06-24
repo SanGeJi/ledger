@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ledger 记账</title>
+<link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+<div id="app">
+  <nav v-if="user" class="nav">
+    <span class="brand">Ledger</span>
+    <a href="#/" :class="{active:route==='/'}">看板</a>
+    <a href="#/transactions" :class="{active:route==='/transactions'}">交易</a>
+    <a href="#/categories" :class="{active:route==='/categories'}">分类</a>
+    <span class="spacer"></span>
+    <span class="user">{{ user.username }}</span>
+    <button class="link" @click="logout">登出</button>
+  </nav>
+
+  <!-- 登录 / 注册 -->
+  <div v-if="route==='/login'" class="auth-wrap">
+    <div class="auth">
+      <h1>Ledger</h1>
+      <p class="sub">个人记账</p>
+      <div class="tabs">
+        <button :class="{on:isLogin}" @click="isLogin=true">登录</button>
+        <button :class="{on:!isLogin}" @click="isLogin=false">注册</button>
+      </div>
+      <input v-model="authForm.username" placeholder="用户名" @keyup.enter="submitAuth" />
+      <input v-model="authForm.password" type="password" placeholder="密码（至少6位）" @keyup.enter="submitAuth" />
+      <button class="primary block" @click="submitAuth">{{ isLogin ? '登录' : '注册' }}</button>
+      <p v-if="authError" class="err">{{ authError }}</p>
+    </div>
+  </div>
+
+  <!-- 看板 -->
+  <div v-else-if="route==='/'" class="page">
+    <div class="stats">
+      <div class="card income"><span class="lbl">总收入</span><span class="val">¥{{ money(dash.totalIncome) }}</span></div>
+      <div class="card expense"><span class="lbl">总支出</span><span class="val">¥{{ money(dash.totalExpense) }}</span></div>
+      <div class="card balance"><span class="lbl">结余</span><span class="val">¥{{ money(dash.balance) }}</span></div>
+    </div>
+    <div class="charts">
+      <div class="chart-box"><h3>近30天趋势</h3><canvas ref="trendChart"></canvas></div>
+      <div class="chart-box"><h3>支出分类</h3><canvas ref="catChart"></canvas>
+        <p v-if="dash.byCategory.length===0" class="muted">暂无支出</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 交易 -->
+  <div v-else-if="route==='/transactions'" class="page">
+    <div class="row">
+      <select v-model="filters.type"><option value="">全部类型</option><option value="expense">支出</option><option value="income">收入</option></select>
+      <select v-model="filters.category"><option value="">全部分类</option><option v-for="c in allCategories" :key="c.id" :value="c.id">{{ c.name }}</option></select>
+      <input type="date" v-model="filters.from" />
+      <input type="date" v-model="filters.to" />
+      <button class="primary" @click="loadTransactions">筛选</button>
+      <button class="ghost" @click="resetFilters">重置</button>
+      <span class="spacer"></span>
+      <button class="primary" @click="resetTxForm">+ 新增</button>
+    </div>
+
+    <div class="form-card" v-if="txForm.amount!==null">
+      <h3>{{ editingId ? '编辑交易' : '新增交易' }}</h3>
+      <div class="grid2">
+        <select v-model="txForm.type"><option value="expense">支出</option><option value="income">收入</option></select>
+        <input v-model="txForm.amount" type="number" step="0.01" placeholder="金额" />
+        <select v-model="txForm.category_id"><option value="">选分类</option><option v-for="c in (txForm.type==='income'?categories.income:categories.expense)" :key="c.id" :value="c.id">{{ c.name }}</option></select>
+        <input v-model="txForm.date" type="date" />
+        <input v-model="txForm.note" placeholder="备注" class="span2" />
+      </div>
+      <div class="row"><button class="primary" @click="saveTx">保存</button><button class="ghost" @click="txForm.amount=null">取消</button></div>
+    </div>
+
+    <div class="list">
+      <div class="th"><span>日期</span><span>类型</span><span>分类</span><span>备注</span><span class="r">金额</span><span class="r">操作</span></div>
+      <div class="tr" v-for="t in txns" :key="t.id">
+        <span>{{ t.date }}</span>
+        <span :class="t.type">{{ t.type==='income'?'收入':'支出' }}</span>
+        <span>{{ t.category_name || '-' }}</span>
+        <span>{{ t.note || '-' }}</span>
+        <span class="r" :class="t.type">{{ t.type==='income'?'+':'-' }}¥{{ money(t.amount) }}</span>
+        <span class="r"><button class="link" @click="editTx(t)">改</button> <button class="link" @click="delTx(t.id)">删</button></span>
+      </div>
+      <p v-if="txns.length===0" class="muted">暂无交易</p>
+    </div>
+  </div>
+
+  <!-- 分类 -->
+  <div v-else-if="route==='/categories'" class="page">
+    <div class="form-card">
+      <h3>新增分类</h3>
+      <div class="grid2">
+        <input v-model="catForm.name" placeholder="分类名" />
+        <select v-model="catForm.type"><option value="expense">支出</option><option value="income">收入</option></select>
+        <input v-model="catForm.color" type="color" class="span2" />
+      </div>
+      <button class="primary" @click="saveCat">添加</button>
+    </div>
+    <div class="grid2">
+      <div><h3>支出</h3><div class="cat" v-for="c in categories.expense" :key="c.id"><i :style="{background:c.color}"></i>{{ c.name }}<button v-if="!c.is_default" class="link" @click="delCat(c.id)">删</button></div></div>
+      <div><h3>收入</h3><div class="cat" v-for="c in categories.income" :key="c.id"><i :style="{background:c.color}"></i>{{ c.name }}<button v-if="!c.is_default" class="link" @click="delCat(c.id)">删</button></div></div>
+    </div>
+  </div>
+</div>
+<script src="/vendor/vue.js"></script>
+<script src="/vendor/chart.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>
